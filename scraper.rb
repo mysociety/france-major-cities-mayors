@@ -65,15 +65,6 @@ end
 
 wikipedia_url = 'https://fr.wikipedia.org/wiki/Liste_des_maires_des_grandes_villes_fran%C3%A7aises'
 
-page = scrape(wikipedia_url => MayorsListPage)
-
-mayors = page.mayors.map(&:to_h)
-
-wikidata_ids = mayors.map { |m| m[:commune_wikidata] }
-
-# P374 is the INSEE municipality code in Wikidata
-insee_code_lookup = Wikisnakker::Item.find(wikidata_ids).map { |i| [i.id, i.P374.to_s] }.to_h
-
-mayors.each do |m|
-  ScraperWiki.save_sqlite([:id], m.merge(insee_code: insee_code_lookup[m[:commune_wikidata]]))
+scrape(wikipedia_url => MayorsListPage).mayors.each do |m|
+  ScraperWiki.save_sqlite([:id], m.to_h.merge(insee_code: Wikisnakker::Item.find(m.commune_wikidata).P374.to_s))
 end
