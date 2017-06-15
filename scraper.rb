@@ -76,7 +76,9 @@ mayors = page.mayors.map(&:to_h)
 wikidata_ids = mayors.map { |m| m[:commune_wikidata] }
 
 # P374 is the INSEE municipality code in Wikidata
-insee_code_lookup = Wikisnakker::Item.find(wikidata_ids).map { |i| [i.id, i.P374.to_s] }.to_h
+insee_code_lookup = wikidata_ids.each_slice(20).flat_map do |ids|
+  Wikisnakker::Item.find(ids).map { |i| [i.id, i.P374.to_s] }
+end.to_h
 
 mayors.each do |m|
   ScraperWiki.save_sqlite([:id], m.merge(insee_code: insee_code_lookup[m[:commune_wikidata]]))
