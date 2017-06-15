@@ -8,6 +8,7 @@ require 'active_support/core_ext/string'
 require 'wikidata_ids_decorator'
 require 'table_unspanner'
 require 'wikisnakker'
+require 'csv'
 
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
@@ -80,6 +81,8 @@ insee_code_lookup = wikidata_ids.each_slice(50).flat_map do |ids|
   Wikisnakker::Item.find(ids).map { |i| [i.id, i.P374.to_s] }
 end.to_h
 
+facebook_urls = CSV.read('facebook-urls.csv').drop(1).to_h
+
 mayors.each do |m|
-  ScraperWiki.save_sqlite([:id], m.merge(insee_code: insee_code_lookup[m[:commune_wikidata]]))
+  ScraperWiki.save_sqlite([:id], m.merge(insee_code: insee_code_lookup[m[:commune_wikidata]], facebook_url: facebook_urls[m[:name]]))
 end
