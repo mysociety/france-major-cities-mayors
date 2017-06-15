@@ -48,6 +48,10 @@ class Mayor < Scraped::HTML
     noko.xpath('td[5]/a/@title|td[5]/text()').text.tidy
   end
 
+  field :commune do
+    noko.xpath('td[1]').text.tidy
+  end
+
   field :commune_wikidata do
     noko.xpath('td[1]/a/@wikidata').text.tidy
   end
