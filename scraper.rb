@@ -76,7 +76,7 @@ mayors = page.mayors.map(&:to_h)
 wikidata_ids = mayors.map { |m| m[:commune_wikidata] }
 
 # P374 is the INSEE municipality code in Wikidata
-insee_code_lookup = wikidata_ids.each_slice(20).flat_map do |ids|
+insee_code_lookup = wikidata_ids.each_slice(50).flat_map do |ids|
   Wikisnakker::Item.find(ids).map { |i| [i.id, i.P374.to_s] }
 end.to_h
 
